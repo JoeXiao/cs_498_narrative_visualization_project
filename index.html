@@ -10,10 +10,10 @@
     opacity: 1;
     position: absolute;
     text-align: left;
-    width: 200px;
+    width: 165px;
     height: 40px;
     background: transparent;
-    border: 0px;
+    border: 1px;
   }
 </style>
 
@@ -56,7 +56,7 @@
     .attr("x", (width / 2))
     .attr("y", 0 - (margin.top / 2) + 10)
     .attr("text-anchor", "middle")
-    .style("font-size", "20px")
+    .style("font-size", "21px")
     .style("text-decoration", "underline")
     .text(title);
 
@@ -75,7 +75,7 @@
     .style("opacity", 0)
     .attr("class", "tooltip")
     .style("background-color", "white")
-    .style("border", 'none')
+    .style("border", 'solid')
     .style("border-width", "2px")
     .style("border-radius", "5px")
     .style("padding", "5px")
@@ -86,7 +86,7 @@
     //data.forEach(function(d){ d['year'] = +d['year']}); 
 
     // List dropdown menu items
-    var allGroup = ["mpg", 'cylinders', 'displacement', 'horsepower', "weight", "acceleration"]
+    var allGroup = ["MPG", 'Cylinders', 'Displacement', 'Horsepower', "Weight", "Acceleration"]
 
     // add the options to the button
     d3.select("#selectButton")
@@ -102,10 +102,11 @@
       .domain([1970, 1982])
       .range([0, width])
       .nice()
+
     svg.append("g")
+      .style("font", "14px times")
       .attr("transform", "translate(10," + (height + 60) + ")")
-      .call(d3.axisBottom(x).tickFormat(d3.format("d")) // remove ',' delimitation
-)
+      .call(d3.axisBottom(x).tickFormat(d3.format("d"))) // remove ',' delimitation
 
     // text label for the x axis
     svg.append("text")
@@ -115,6 +116,38 @@
       .style("text-anchor", "middle")
       .text("Year");
 
+    // add dynamic annotation function
+    var annotation_dynamic = svg.append("text")
+      .attr("transform",
+        "translate(" + (width / 2 - 55) + " ," +
+        (height + margin.top) + ")")
+      .style('font-weight', 700)
+      .text(function (d) { return d })
+
+
+    // display dynamic annotation 
+    annotation_dynamic
+      .text('')
+      .transition()
+      .delay(750)
+      .duration(1000)
+      .text("MPG: increase over time")
+
+    // add static annotation 
+    var annotation_static = svg.append("text")
+      .attr("transform",
+        "translate(" + (width / 2 - 55) + " ," +
+        (height + margin.top + 30) + ")")
+      .text(function (d) { return d })
+
+    // display static annotation 
+    annotation_static
+      .text('')
+      .transition()
+      .delay(750)
+      .duration(1000)
+      .text("What does it mean? How does it relate to other car attributes?")
+
     // Add Y axis
     var y = d3.scaleLinear()
       .domain([0, 1]) // edit data range
@@ -122,6 +155,7 @@
       .nice()
 
     var yAxis = svg.append("g")
+      .style("font", "14px times")
       .attr("transform", "translate(10," + 0 + ")")
       .call(d3.axisLeft(y));
 
@@ -137,16 +171,16 @@
       .text(function (d) { return d });
 
     // initialize ylabel 
-    y_textLabel.text('mpg')
+    y_textLabel.text('MPG')
 
-    // Initialize line with group a
+    // Initialize line with mpg
     var line = svg
       .append('g')
       .append("path")
       .datum(data)
       .attr("d", d3.line()
         .x(function (d) { return x(+d.year) })
-        .y(function (d) { return y(+d.mpg) })
+        .y(function (d) { return y(+d.MPG) })
       )
       .attr("stroke", "black")
       .style("stroke-width", 4)
@@ -174,7 +208,7 @@
     }
 
     // initialize tooltip values 
-    var dataInit = data.map(function (d) { return { year: d.year, value: d.mpg } })
+    var dataInit = data.map(function (d) { return { year: d.year, value: d.MPG } })
 
     // Initialize dots with group a
     var dot = svg
@@ -199,6 +233,30 @@
 
       // update text label for the y axis
       y_textLabel.text(selectedGroup)
+
+      // come up with updated annotation message
+
+      var update_annotaion = (function (d) {
+        if (d == 'MPG') { return "MPG: increase over time" }
+        else if (d == 'Acceleration') { return "Acceleration: slight increase over time" }
+        else { return selectedGroup + ': decrease over time' }
+      })
+
+      // update annotations
+      annotation_dynamic
+      .text('')
+      .transition()
+      .delay(750)
+      .duration(1000)
+      .text(update_annotaion(selectedGroup))
+
+      // update annotations
+      annotation_static
+      .text('')
+      .transition()
+      .delay(750)
+      .duration(1000)
+      .text("What does it mean? How does it compare to other car attributes?")
 
       // Give these new data to update line
       line
