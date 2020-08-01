@@ -69,6 +69,15 @@
     .style('fill', 'red')
     .html('Drop-down menu &#8594; change car spec | Hover over data &#8594; view details')
 
+  // add instructions under drop-down menu
+  svg.append("text")
+    .attr("x", 0 + 12)
+    .attr("y", 0 - (margin.top / 2) + 10)
+    .attr("text-anchor", "middle")
+    .style("font-size", "16px")
+    .style('fill', 'black')
+    .html('(View in order)')
+
   // create a tooltip
   var tooltip = d3.select("#tooltip")
     .append("div")
@@ -244,19 +253,19 @@
 
       // update annotations
       annotation_dynamic
-      .text('')
-      .transition()
-      .delay(750)
-      .duration(1000)
-      .text(update_annotaion(selectedGroup))
+        .text('')
+        .transition()
+        .delay(750)
+        .duration(1000)
+        .text(update_annotaion(selectedGroup))
 
       // update annotations
       annotation_static
-      .text('')
-      .transition()
-      .delay(750)
-      .duration(1000)
-      .text("What does it mean? How does it compare to other car attributes?")
+        .text('')
+        .transition()
+        .delay(750)
+        .duration(1000)
+        .text("What does it mean? How does it compare to other car attributes?")
 
       // Give these new data to update line
       line
